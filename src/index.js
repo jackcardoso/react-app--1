@@ -9,7 +9,7 @@ module.exports = (req, res) =>{
         <ul>
             <li><a href="/">Home</a></li>
             <li><a href="/about">About</a></li>
-            <li><a href="/insertData">Insert</a></li>
+            <li><a href="/novoProduto">Insert</a></li>
         </ul>
             <h1>Rota Home</h1>
         </body>
