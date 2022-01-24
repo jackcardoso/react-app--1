@@ -1,20 +1,29 @@
-version: "3" ## especifica a versão do docker-compose file
-
 services: ## Define um serviço
   app: ## nome do serviço
     build: . ## localização do dockerfile
     command: npm start ## comando a executar
+    # command: ["./wait-for-it.sh", "db:5432", "--", "npm", "run", "db"]
     ports:
       - "3000:3000" ## redirecionamento de porta quando chegar alguma requisição na porta 3000 chama o container na porta 3000
     volumes:
-      - ./:/usr/app ## monitoro a pasta atual . e envio as alterações para /usr/app
-      - /usr/app/node_modules ## obrigatório carrregar o node_modules
+      - ./:/src ## monitoro a pasta atual . e envio as alterações para /usr/app
+      - /src/node_modules ## obrigatório carrregar o node_modules
+    working_dir: /src    
     depends_on:
-      - db
+      - "db"
     links:
-      - db 
-    # working_dir: "/usr/app"    
-    
+      - "db"
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PASSWORD: mypass
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PORT: 5432
+      DATABASE_URL: postgres://postgres:mypass@db:5432/postgres
+    networks:
+      - default
+ 
+ 
   db:
     image: postgres
     restart: always
@@ -22,9 +31,12 @@ services: ## Define um serviço
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=mypass
+      - POSTGRES_HOST=localhost
     ports:
       - 5432:5432
     expose:
-      - 5432
+      - "5432"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - default
